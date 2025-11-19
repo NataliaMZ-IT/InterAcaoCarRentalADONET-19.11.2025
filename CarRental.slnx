@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Solution Items/CREATE_SCHEMA.sql" />
+  </Folder>
+  <Project Path="CarRental.Controller/CarRental.Controller.csproj" />
+  <Project Path="CarRental.Models/CarRental.Models.csproj" />
+  <Project Path="CarRental.View/CarRental.View.csproj" />
+  <Project Path="Utils/Utils.csproj" />
+</Solution>
