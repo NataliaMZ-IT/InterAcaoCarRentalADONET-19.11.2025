@@ -28,10 +28,15 @@ namespace CarRental.Controller
 
                     transaction.Commit();
                 }
-                catch (Exception ex) 
+                catch (SqlException ex) 
                 {
                     transaction.Rollback();
-                    throw new Exception("Error adding customer " + ex.Message);
+                    throw new Exception("Error adding customer: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error adding customer: " + ex.Message);
                 }
                 finally
                 {
@@ -128,26 +133,32 @@ namespace CarRental.Controller
             customerFound.SetTelephone(telephone);
 
             Connection.Open();
-            try
-            {
-                var command = new SqlCommand(Customer.UPDATECUSTOMERTELEPHONE, Connection);
-                command.Parameters.AddWithValue("@Telephone", customerFound.Telephone);
-                command.Parameters.AddWithValue("@CustomerID", customerFound.CustomerID);
-                command.ExecuteNonQuery();
-            }
-            catch (SqlException ex)
-            {
-                throw new Exception("Error updating customer telephone: " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Unexpected error updating customer telephone: " + ex.Message);
-            }
-            finally
-            {
-                Connection.Close();
-            }
+            using (SqlTransaction transaction = Connection.BeginTransaction()) 
+            { 
+                try
+                {
+                    var command = new SqlCommand(Customer.UPDATECUSTOMERTELEPHONE, Connection, transaction);
+                    command.Parameters.AddWithValue("@Telephone", customerFound.Telephone);
+                    command.Parameters.AddWithValue("@CustomerID", customerFound.CustomerID);
 
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error updating customer telephone: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error updating customer telephone: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
         }
 
         public void DeleteCustomer(string email)
