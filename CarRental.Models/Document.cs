@@ -10,6 +10,13 @@ namespace CarRental.Models
                                         "(ClienteID, TipoDocumento, Numero, DataEmissao, DataValidade) " +
                                         "VALUES (@CustomerID, @DocumentType, @Number, @EmissionDate, @ExpirationDate)";
 
+        public readonly static string UPDATEDOCUMENT = @"UPDATE tblDocumentos 
+                                                        SET TipoDocumento = @DocumentType, 
+                                                        Numero = @Number, 
+                                                        DataEmissao = @EmissionDate, 
+                                                        DataValidade = @ExpirationDate
+                                                        WHERE ClienteID = @CustomerID;";
+
         public int DocumentID { get; private set; }
         public int CustomerID { get; private set; }
         public string DocumentType { get; private set; }

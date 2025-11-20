@@ -115,6 +115,13 @@ namespace CarRental.Controller
                                                 reader["Telefone"].ToString() : null
                                                 );
                     customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
+
+                    var document = new Document(reader["TipoDocumento"].ToString(),
+                                                    reader["Numero"].ToString(),
+                                                    DateOnly.FromDateTime(reader.GetDateTime(6)),
+                                                    DateOnly.FromDateTime(reader.GetDateTime(7))
+                                                    );
+                    customer.SetDocument(document);
                     return customer;
                 }
                 return null;
@@ -135,9 +142,7 @@ namespace CarRental.Controller
 
         public void UpdateCustomerTelephone(string telephone, string email)
         {
-            var customerFound = this.FindCustomerByEmail(email);
-
-            if (customerFound is null)
+            var customerFound = this.FindCustomerByEmail(email) ?? 
                 throw new Exception("Customer not found!");
 
             customerFound.SetTelephone(telephone);
@@ -171,7 +176,41 @@ namespace CarRental.Controller
             }
         }
 
-        public void DeleteCustomer(string email)
+        public void UpdateCustomerDocument(Document document, string email)
+        {
+            var customerFound = this.FindCustomerByEmail(email) ??
+                throw new Exception("Customer not found!");
+
+            Connection.Open();
+
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    document.SetCustomerID(customerFound.CustomerID);
+                    DocumentController documentController = new DocumentController();
+
+                    documentController.UpdateDocument(document, Connection, transaction);
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error updating customer document: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error updating customer document: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
+        }
+
+        public void DeleteCustomerByEmail(string email)
         {
             var customer = this.FindCustomerByEmail(email);
 

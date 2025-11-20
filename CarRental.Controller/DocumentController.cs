@@ -9,7 +9,6 @@ namespace CarRental.Controller
 {
     public class DocumentController
     {
-        private readonly SqlConnection Connection = new(ConnectionDB.GetConnectionString());
         public void AddDocument(Document document, SqlConnection connection, SqlTransaction transaction)
         {
             try
@@ -31,6 +30,30 @@ namespace CarRental.Controller
             catch (Exception ex)
             {
                 throw new Exception("Unexpected error inserting new document: " + ex.Message);
+            }
+        }
+
+        public void UpdateDocument(Document document, SqlConnection connection, SqlTransaction transaction)
+        {
+            try
+            {
+                var command = new SqlCommand(Document.UPDATEDOCUMENT, connection, transaction);
+
+                command.Parameters.AddWithValue("@DocumentType", document.DocumentType);
+                command.Parameters.AddWithValue("@Number", document.Number);
+                command.Parameters.AddWithValue("@EmissionDate", document.EmissionDate);
+                command.Parameters.AddWithValue("@ExpirationDate", document.ExpirationDate);
+                command.Parameters.AddWithValue("@CustomerID", document.CustomerID);
+
+                command.ExecuteNonQuery();
+            }
+            catch (SqlException ex) 
+            {
+                throw new Exception("Erro updating document: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error updating document: " + ex.Message);
             }
         }
     }
