@@ -57,7 +57,7 @@ namespace CarRental.Controller
                 SqlCommand command = new SqlCommand(Customer.SELECTALLCUSTOMERS, Connection);
 
                 SqlDataReader reader = command.ExecuteReader();
-
+                
                 List<Customer> customers = [];
                 using (reader)
                 {
@@ -68,7 +68,14 @@ namespace CarRental.Controller
                                                     reader["Telefone"] != DBNull.Value ?
                                                     reader["Telefone"].ToString() : null
                                                     );
-                        customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
+                        //customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
+
+                        var document = new Document(reader["TipoDocumento"].ToString(),
+                                                    reader["Numero"].ToString(),
+                                                    DateOnly.FromDateTime(reader.GetDateTime(5)),
+                                                    DateOnly.FromDateTime(reader.GetDateTime(6))
+                                                    );
+                        customer.SetDocument(document);
 
                         customers.Add(customer);
                     }

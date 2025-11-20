@@ -5,7 +5,11 @@
         public readonly static string INSERTCUSTOMER = "INSERT INTO tblClientes VALUES (@Name, @Email, @Telephone); " +
                                                        "SELECT SCOPE_IDENTITY();";
 
-        public readonly static string SELECTALLCUSTOMERS = "SELECT * FROM tblClientes;";
+        public readonly static string SELECTALLCUSTOMERS = @"SELECT c.Nome, c.Email, c.Telefone, 
+                                                            d.TipoDocumento, d.Numero, d.DataEmissao, d.DataValidade 
+                                                            FROM tblClientes c
+                                                            JOIN tblDocumentos d
+                                                            ON c.ClienteID = d.ClienteID;";
 
         public readonly static string SELECTCUSTOMERBYEMAIL = "SELECT * FROM tblClientes WHERE Email = @Email;";
 
@@ -18,6 +22,7 @@
         public string Name { get; private set; }
         public string Email { get; private set; }
         public string? Telephone { get; private set; } = String.Empty;
+        public Document? Document { get; private set; }
 
         public Customer(string name, string email)
         {
@@ -40,11 +45,17 @@
             Telephone = telephone;
         }
 
+        public void SetDocument(Document document)
+        {
+            Document = document;
+        }
+
         public override string? ToString()
         {
             return $"Name: {Name}\n" +
                    $"Email: {Email}\n" +
-                   $"Telephone: {(Telephone == string.Empty ? "No telephone number" : Telephone)}\n";
+                   $"Telephone: {(Telephone == string.Empty ? "No telephone number" : Telephone)}\n" +
+                   $"{Document}\n";
         }
     }
 }
