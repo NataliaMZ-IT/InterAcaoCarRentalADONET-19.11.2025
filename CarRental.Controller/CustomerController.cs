@@ -31,7 +31,7 @@ namespace CarRental.Controller
                 catch (Exception ex) 
                 {
                     transaction.Rollback();
-                    throw new Exception("Error when adding customer " + ex.Message);
+                    throw new Exception("Error adding customer " + ex.Message);
                 }
                 finally
                 {
@@ -69,11 +69,11 @@ namespace CarRental.Controller
             }
             catch (SqlException ex)
             {
-                throw new Exception("Erro when listing customers: " + ex.Message);
+                throw new Exception("Erro listing customers: " + ex.Message);
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error when listing customers" + ex.Message);
+                throw new Exception("Unexpected error listing customers" + ex.Message);
             }
             finally
             {
@@ -106,11 +106,11 @@ namespace CarRental.Controller
             }
             catch (SqlException ex)
             {
-                throw new Exception("Error when finding customer by email: " + ex.Message);
+                throw new Exception("Error finding customer by email: " + ex.Message);
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error when finding customer by email: " + ex.Message);
+                throw new Exception("Unexpected error finding customer by email: " + ex.Message);
             }
             finally
             {
@@ -120,11 +120,10 @@ namespace CarRental.Controller
 
         public void UpdateCustomerTelephone(string telephone, string email)
         {
-            //TODO: Create FindCustomerByEmail
             var customerFound = this.FindCustomerByEmail(email);
             
             if (customerFound is null)
-                throw new Exception("No customer found!");
+                throw new Exception("Customer not found!");
 
             customerFound.SetTelephone(telephone);
 
@@ -138,17 +137,52 @@ namespace CarRental.Controller
             }
             catch (SqlException ex)
             {
-                throw new Exception("Error when updating customer's telephone: " + ex.Message);
+                throw new Exception("Error updating customer telephone: " + ex.Message);
             }
             catch (Exception ex)
             {
-                throw new Exception("Unexpected error when updating customer's telephone: " + ex.Message);
+                throw new Exception("Unexpected error updating customer telephone: " + ex.Message);
             }
             finally
             {
                 Connection.Close();
             }
 
+        }
+
+        public void DeleteCustomer(string email)
+        {
+            var customer = this.FindCustomerByEmail(email);
+
+            if (customer is null)
+                throw new Exception("Customer not found!");
+
+            Connection.Open();
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    var command = new SqlCommand(Customer.DELETECUSTOMERBYID, Connection, transaction);
+                    command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
+
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error deleting customer: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error deleting customer: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
         }
     }
 }
