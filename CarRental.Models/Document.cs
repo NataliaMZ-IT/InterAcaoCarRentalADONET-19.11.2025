@@ -6,6 +6,10 @@ namespace CarRental.Models
 {
     public class Document
     {
+        public readonly static string INSERTDOCUMENT = "INSERT INTO tblDocumentos " +
+                                        "(ClienteID, TipoDocumento, Numero, DataEmissao, DataValidade) " +
+                                        "VALUES (@CustomerID, @DocumentType, @Number, @EmissionDate, @ExpirationDate)";
+
         public int DocumentID { get; private set; }
         public int CustomerID { get; private set; }
         public string DocumentType { get; private set; }
@@ -13,13 +17,17 @@ namespace CarRental.Models
         public DateOnly EmissionDate { get; private set; }
         public DateOnly ExpirationDate { get; private set; }
 
-        public Document(int customerID, string documentType, string number, DateOnly emissionDate, DateOnly expirationDate)
+        public Document(string documentType, string number, DateOnly emissionDate, DateOnly expirationDate)
         {
-            CustomerID = customerID;
             DocumentType = documentType;
             Number = number;
             EmissionDate = emissionDate;
             ExpirationDate = expirationDate;
+        }
+
+        public void SetCustomerID(int customerID)
+        {
+            CustomerID = customerID; 
         }
 
         public override string? ToString()

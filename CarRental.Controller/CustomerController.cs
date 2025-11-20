@@ -8,7 +8,7 @@ namespace CarRental.Controller
     {
         private readonly SqlConnection Connection = new(ConnectionDB.GetConnectionString());
 
-        public void AddCustomer(Customer customer)
+        public void AddCustomer(Customer customer, Document document)
         {
             Connection.Open();
             using (SqlTransaction transaction = Connection.BeginTransaction())
@@ -21,14 +21,17 @@ namespace CarRental.Controller
                     command.Parameters.AddWithValue("@Email", customer.Email);
                     command.Parameters.AddWithValue("@Telephone", customer.Telephone ?? (object)DBNull.Value);
 
-                    int customerId = Convert.ToInt32(command.ExecuteScalar());
-                    customer.SetCustomerID(customerId);
+                    int customerID = Convert.ToInt32(command.ExecuteScalar());
+                    customer.SetCustomerID(customerID);
 
-                    //customer.SetCustomerID(Convert.ToInt32(command.ExecuteScalar()));
+                    var documentController = new DocumentController();
+
+                    document.SetCustomerID(customerID);
+                    documentController.AddDocument(document, Connection, transaction);
 
                     transaction.Commit();
                 }
-                catch (SqlException ex) 
+                catch (SqlException ex)
                 {
                     transaction.Rollback();
                     throw new Exception("Error adding customer: " + ex.Message);
@@ -61,8 +64,8 @@ namespace CarRental.Controller
                     while (reader.Read())
                     {
                         var customer = new Customer(reader["Nome"].ToString(),
-                                                    reader["Email"].ToString(), 
-                                                    reader["Telefone"] != DBNull.Value ? 
+                                                    reader["Email"].ToString(),
+                                                    reader["Telefone"] != DBNull.Value ?
                                                     reader["Telefone"].ToString() : null
                                                     );
                         customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
@@ -126,15 +129,15 @@ namespace CarRental.Controller
         public void UpdateCustomerTelephone(string telephone, string email)
         {
             var customerFound = this.FindCustomerByEmail(email);
-            
+
             if (customerFound is null)
                 throw new Exception("Customer not found!");
 
             customerFound.SetTelephone(telephone);
 
             Connection.Open();
-            using (SqlTransaction transaction = Connection.BeginTransaction()) 
-            { 
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
                 try
                 {
                     var command = new SqlCommand(Customer.UPDATECUSTOMERTELEPHONE, Connection, transaction);
