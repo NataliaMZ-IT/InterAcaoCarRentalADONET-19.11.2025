@@ -173,7 +173,7 @@ namespace CarRental.Controller
             {
                 try
                 {
-                    var command = new SqlCommand(Customer.DELETECUSTOMERBYID, Connection, transaction);
+                    var command = new SqlCommand(Customer.DELETECUSTOMERBYEMAIL, Connection, transaction);
                     command.Parameters.AddWithValue("@CustomerID", customer.CustomerID);
 
                     command.ExecuteNonQuery();

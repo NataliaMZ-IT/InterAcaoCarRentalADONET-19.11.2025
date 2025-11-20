@@ -12,7 +12,7 @@
         public readonly static string UPDATECUSTOMERTELEPHONE = "UPDATE tblClientes SET Telefone = @Telephone " +
                                                                 "WHERE ClienteID = @CustomerID;";
 
-        public readonly static string DELETECUSTOMERBYID = "DELETE FROM tblClientes WHERE ClienteID = @CustomerID;";
+        public readonly static string DELETECUSTOMERBYEMAIL = "DELETE FROM tblClientes WHERE ClienteID = @CustomerID;";
 
         public int CustomerID { get; private set; }
         public string Name { get; private set; }
