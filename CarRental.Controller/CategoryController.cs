@@ -1,8 +1,5 @@
 ﻿using CarRental.Models;
 using Microsoft.Data.SqlClient;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Utils.Databases;
 
 namespace CarRental.Controller
@@ -111,6 +108,38 @@ namespace CarRental.Controller
             finally
             {
                 Connection.Close(); 
+            }
+        }
+
+        public string FindCategoryNameById(int id)
+        {
+            Connection.Open();
+            try
+            {
+                var command = new SqlCommand(Category.SELECTCATEGORYNAMEBYID, Connection);
+                command.Parameters.AddWithValue("@CategoryID", id);
+
+                string categoryName = String.Empty;
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        categoryName = reader["Nome"].ToString() ?? string.Empty;
+                    }
+                    return categoryName;
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error finding category: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Unexpected error finding category: " + ex.Message);
+            }
+            finally
+            {
+                Connection.Close();
             }
         }
 

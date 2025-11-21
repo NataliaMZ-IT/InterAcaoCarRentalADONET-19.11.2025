@@ -106,23 +106,25 @@ namespace CarRental.Controller
                 command.Parameters.AddWithValue("@Email", email);
 
                 SqlDataReader reader = command.ExecuteReader();
-
-                if (reader.Read())
+                using (reader)
                 {
-                    var customer = new Customer(reader["Nome"].ToString(),
-                                                reader["Email"].ToString(),
-                                                reader["Telefone"] != DBNull.Value ?
-                                                reader["Telefone"].ToString() : null
-                                                );
-                    customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
-
-                    var document = new Document(reader["TipoDocumento"].ToString(),
-                                                    reader["Numero"].ToString(),
-                                                    DateOnly.FromDateTime(reader.GetDateTime(6)),
-                                                    DateOnly.FromDateTime(reader.GetDateTime(7))
+                    if (reader.Read())
+                    {
+                        var customer = new Customer(reader["Nome"].ToString(),
+                                                    reader["Email"].ToString(),
+                                                    reader["Telefone"] != DBNull.Value ?
+                                                    reader["Telefone"].ToString() : null
                                                     );
-                    customer.SetDocument(document);
-                    return customer;
+                        customer.SetCustomerID(Convert.ToInt32(reader["ClienteID"]));
+
+                        var document = new Document(reader["TipoDocumento"].ToString(),
+                                                        reader["Numero"].ToString(),
+                                                        DateOnly.FromDateTime(reader.GetDateTime(6)),
+                                                        DateOnly.FromDateTime(reader.GetDateTime(7))
+                                                        );
+                        customer.SetDocument(document);
+                        return customer;
+                    }
                 }
                 return null;
             }

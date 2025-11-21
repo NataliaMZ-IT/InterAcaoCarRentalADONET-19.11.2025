@@ -6,9 +6,9 @@ namespace CarRental.Models.Enums
 {
     public enum EVehicleStatus
     {
-        Disponivel,
+        Disponível,
         Alugado,
-        Manutencao,
+        Manutenção,
         Reservado
     }
 }

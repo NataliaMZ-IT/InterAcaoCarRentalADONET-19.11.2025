@@ -14,6 +14,9 @@ namespace CarRental.Models
         public readonly static string SELECTCATEGORYBYNAME = @"SELECT * FROM tblCategorias
                                                                WHERE Nome = @Name";
 
+        public readonly static string SELECTCATEGORYNAMEBYID = @"SELECT Nome FROM tblCategorias
+                                                               WHERE CategoriaID = @CategoryID";
+
         public readonly static string UPDATECATEGORYBYNAME = @"UPDATE tblCategorias 
                                                                SET Descricao = @Description, Diaria = @DailyRate
                                                                WHERE Nome = @Name";
