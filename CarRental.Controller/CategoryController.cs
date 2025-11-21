@@ -19,7 +19,6 @@ namespace CarRental.Controller
                 try
                 {
                     var command = new SqlCommand(Category.INSERTCATEGORY, Connection, transaction);
-
                     command.Parameters.AddWithValue("@Name", category.Name);
                     command.Parameters.AddWithValue("@Description", category.Description ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@DailyRate", category.DailyRate);
@@ -51,10 +50,8 @@ namespace CarRental.Controller
             {
                 var command = new SqlCommand(Category.SELECTALLCATEGORIES, Connection);
 
-                SqlDataReader reader = command.ExecuteReader();
-
                 List<Category> categories = [];
-                using (reader)
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
@@ -87,12 +84,9 @@ namespace CarRental.Controller
             try
             {
                 var command = new SqlCommand(Category.SELECTCATEGORYBYNAME, Connection);
-
                 command.Parameters.AddWithValue("@Name", name);
 
-                SqlDataReader reader = command.ExecuteReader();
-
-                using (reader)
+                using (SqlDataReader reader = command.ExecuteReader())
                 {
                     if (reader.Read())
                     {
@@ -117,6 +111,113 @@ namespace CarRental.Controller
             finally
             {
                 Connection.Close(); 
+            }
+        }
+
+        public void UpdateCategory(string description, string name)
+        {
+            var category = this.FindCategoryByName(name) ??
+                throw new Exception("Category not found!");
+
+            category.SetDescription(description);
+
+            Connection.Open();
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    var command = new SqlCommand(Category.UPDATECATEGORYBYNAME, Connection, transaction);
+                    command.Parameters.AddWithValue("@Description", category.Description);
+                    command.Parameters.AddWithValue("@DailyRate", category.DailyRate);
+                    command.Parameters.AddWithValue("@Name", category.Name);
+
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error updating category: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error updating category: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
+        }
+
+        public void UpdateCategory(decimal dailyRate, string name)
+        {
+            var category = this.FindCategoryByName(name) ??
+                throw new Exception("Category not found!");
+
+            category.SetDailyRate(dailyRate);
+
+            Connection.Open();
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    var command = new SqlCommand(Category.UPDATECATEGORYBYNAME, Connection, transaction);
+                    command.Parameters.AddWithValue("@Description", category.Description);
+                    command.Parameters.AddWithValue("@DailyRate", category.DailyRate);
+                    command.Parameters.AddWithValue("@Name", category.Name);
+
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error updating category: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error updating category: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close();
+                }
+            }
+        }
+
+        public void DeleteCategory(string name) 
+        {
+            var category = this.FindCategoryByName(name) ??
+                throw new Exception("Category not found!");
+
+            Connection.Open();
+            using (SqlTransaction transaction = Connection.BeginTransaction())
+            {
+                try
+                {
+                    var command = new SqlCommand(Category.DELETECATEGORYBYID, Connection, transaction);
+                    command.Parameters.AddWithValue("@CategoryID", category.CategoryID);
+
+                    command.ExecuteNonQuery();
+                    transaction.Commit();
+                }
+                catch (SqlException ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Error deleting category: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new Exception("Unexpected error deleting category: " + ex.Message);
+                }
+                finally
+                {
+                    Connection.Close(); 
+                }
             }
         }
     }

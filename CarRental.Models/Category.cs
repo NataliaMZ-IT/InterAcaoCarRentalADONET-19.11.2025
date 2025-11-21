@@ -8,13 +8,15 @@ namespace CarRental.Models
     {
         public readonly static string INSERTCATEGORY = "INSERT INTO tblCategorias VALUES (@Name, @Description, @DailyRate);";
 
-        public readonly static string SELECTALLCATEGORIES = @"SELECT c.Nome, c.Descricao, c.Diaria 
+        public readonly static string SELECTALLCATEGORIES = @"SELECT Nome, Descricao, Diaria 
                                                                FROM tblCategorias";
 
         public readonly static string SELECTCATEGORYBYNAME = @"SELECT * FROM tblCategorias
-                                                               WHERE c.Nome = @Name";
+                                                               WHERE Nome = @Name";
 
-        public readonly static string UPDATECATEGORYBYNAME = "UPDATE tblCategorias WHERE Nome = @Name";
+        public readonly static string UPDATECATEGORYBYNAME = @"UPDATE tblCategorias 
+                                                               SET Descricao = @Description, Diaria = @DailyRate
+                                                               WHERE Nome = @Name";
 
         public readonly static string DELETECATEGORYBYID = "DELETE FROM tblCategorias WHERE CategoriaID = @CategoryID";
 
@@ -37,6 +39,16 @@ namespace CarRental.Models
         public void SetCategoryID(int categoryID)
         {
             CategoryID = categoryID; 
+        }
+
+        public void SetDescription(string description)
+        {
+            Description = description; 
+        }
+
+        public void SetDailyRate(decimal dailyRate)
+        {
+            DailyRate = dailyRate;
         }
 
         public override string ToString()
